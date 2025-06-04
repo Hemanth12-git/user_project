@@ -1,0 +1,44 @@
+html, body, app-root {
+  height: 100%;
+  margin: 0;
+}
+
+body .p-dialog {
+  background: white !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 12px !important;
+}
+
+body .p-dialog .p-dialog-header {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+body .p-dialog .p-dialog-content {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  background: white !important;
+}
+
+.p-dropdown-panel {
+  background-color: #fff !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+  border-radius: 6px !important;
+  border: 1px solid #ccc !important;
+  opacity: 1 !important;
+}
+
+.create-user-dialog {
+  --p-select-overlay-background: #fff;
+  --p-select-overlay-color: #333;
+  --p-select-overlay-border-color: #ccc;
+  --p-select-overlay-border-radius: 6px;
+  --p-select-overlay-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.create-user-dialog {
+  --p-select-option-padding: 6px 8px;
+}
+
+
+
+

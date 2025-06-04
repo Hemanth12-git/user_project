@@ -1,0 +1,384 @@
+
+<div class="users-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1 class="page-title">Users</h1>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline">
+        <i class="icon-download"></i>
+        Import
+      </button>
+      <button class="btn btn-primary" icon="pi pi-user-plus" (click)="openAddUserDialog()">+ Create New User</button>
+
+      <p-dialog 
+        header="Create User" 
+        [(visible)]="displayAddUserDialog" 
+        [modal]="true" 
+        [closable]="true" 
+        [style]="{ width: '50vw', minWidth: '600px' }"
+        styleClass="create-user-dialog">
+        <hr/>
+        <form [formGroup]="userForm" (ngSubmit)="createUser()">
+          <div class="dialog-content">
+            
+            <!-- Header Tab -->
+            <div class="tab-header">
+              <span class="tab-active">GENERAL</span>
+            </div>
+
+            <!-- Form Fields Container -->
+            <div class="form-container">
+              
+              <!-- First Row: User Type and User Role -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="userType">User Type</label>
+                  <p-dropdown 
+                    id="userType"
+                    [options]="userTypes" 
+                    formControlName="userType"
+                    placeholder="Internal"
+                    optionLabel="label" 
+                    optionValue="value"
+                    [style]="{ width: '100%' }">
+                  </p-dropdown>
+                </div>
+                
+                <div class="form-field">
+                  <label for="userRole">User Role</label>
+                  <p-dropdown 
+                    id="userRole"
+                    [options]="userRoles" 
+                    formControlName="userRole"
+                    placeholder="Select Role"
+                    optionLabel="label" 
+                    optionValue="value"
+                    [style]="{ width: '100%' }">
+                  </p-dropdown>
+                </div>
+              </div>
+
+              <!-- Second Row: First Name and Last Name -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="firstName">First Name</label>
+                  <input 
+                    id="firstName" 
+                    type="text" 
+                    pInputText 
+                    formControlName="firstName"
+                    placeholder="First name" />
+                </div>
+                
+                <div class="form-field">
+                  <label for="lastName">Last Name</label>
+                  <input 
+                    id="lastName" 
+                    type="text" 
+                    pInputText 
+                    formControlName="lastName"
+                    placeholder="Last name" />
+                </div>
+              </div>
+
+              <!-- Third Row: Phone Number and Email ID -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="phoneNumber">Phone Number</label>
+                  <input 
+                    id="phoneNumber" 
+                    type="tel" 
+                    pInputText 
+                    formControlName="phoneNumber"
+                    placeholder="Phone Number" />
+                </div>
+                
+                <div class="form-field">
+                  <label for="emailId">Email ID</label>
+                  <input 
+                    id="emailId" 
+                    type="email" 
+                    pInputText 
+                    formControlName="emailId"
+                    placeholder="Email" />
+                </div>
+              </div>
+
+              <!-- Fourth Row: Password and Confirm Password -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="password">Password</label>
+                  <div class="password-field">
+                    <p-password 
+                      id="password"
+                      formControlName="password"
+                      placeholder="Password"
+                      [toggleMask]="true"
+                      [style]="{ width: '100%' }"
+                      inputStyleClass="password-input">
+                    </p-password>
+                  </div>
+                </div>
+                
+                <div class="form-field">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <div class="password-field">
+                    <p-password 
+                      id="confirmPassword"
+                      formControlName="confirmPassword"
+                      placeholder="Confirm password"
+                      [toggleMask]="true"
+                      [style]="{ width: '100%' }"
+                      inputStyleClass="password-input">
+                    </p-password>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fifth Row: User Currency and Number Format -->
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="userCurrency">User Currency</label>
+                  <p-dropdown 
+                    id="userCurrency"
+                    [options]="currencies" 
+                    formControlName="userCurrency"
+                    placeholder="EUR"
+                    optionLabel="label" 
+                    optionValue="value"
+                    [style]="{ width: '100%' }">
+                  </p-dropdown>
+                </div>
+                
+                <div class="form-field">
+                  <label for="numberFormat">Number Format</label>
+                  <div class="number-format-field">
+                    <span class="format-label">Select your number display format</span>
+                    <p-dropdown 
+                      id="numberFormat"
+                      [options]="numberFormats" 
+                      formControlName="numberFormat"
+                      placeholder="1,000,000.00 (English)"
+                      optionLabel="label" 
+                      optionValue="value"
+                      [style]="{ width: '100%' }">
+                    </p-dropdown>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Dialog Footer -->
+          <div class="dialog-footer">
+            <button 
+              pButton 
+              type="button" 
+              label="Cancel" 
+              class="p-button-outlined cancel-btn"
+              (click)="displayAddUserDialog = false">
+            </button>
+            <button 
+              pButton 
+              type="submit" 
+              label="Submit" 
+              class="submit-btn"
+              [disabled]="userForm.invalid">
+            </button>
+          </div>
+          
+        </form>
+      </p-dialog>
+
+    </div>
+  </div>
+  <hr/>
+
+  <div class="main-body">
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <div class="filters-title">
+        <i class="icon-filter"></i>
+        Filters
+        <button class="clear-all-btn" (click)="clearAllFilters()">Clear All</button>
+      </div>
+      <!-- <div class="users-count">
+        {{ totalUsers }} Users Found
+      </div> -->
+      <!-- <button class="export-btn" (click)="exportUsers()">
+        <i class="icon-export"></i>
+        Export
+      </button> -->
+    </div>
+
+    <div class="filters-content">
+      <!-- User Type Filter -->
+      <div class="filter-group">
+        <label class="filter-label">
+          User Type
+          <span class="info-icon">ⓘ</span>
+        </label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input 
+              type="radio" 
+              name="userType" 
+              value="internal" 
+              
+              
+            >
+            Internal Users
+          </label>
+          <label class="radio-label">
+            <input 
+              type="radio" 
+              name="userType" 
+              value="customers" 
+              
+              
+            >
+            Customers
+          </label>
+        </div>
+      </div>
+
+      <!-- User Details Search -->
+      <div class="filter-group">
+        <label class="filter-label">User Details</label>
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search Users" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          >
+          <i class="search-icon">🔍</i>
+        </div>
+      </div>
+
+      <!-- Roles Filter -->
+      <div class="filter-group">
+        <label class="filter-label">Roles</label>
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search Roles" 
+            [(ngModel)]="roleFilter"
+            (input)="onRoleFilterChange()"
+          >
+          <i class="search-icon">🔍</i>
+        </div>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div class="filter-group">
+        <label class="filter-label">
+          Date Range
+          <span class="info-icon">ⓘ</span>
+        </label>
+        <div class="date-range">
+          <div class="date-input-group">
+            <label class="date-label">From</label>
+            <input type="date" class="date-input" [(ngModel)]="fromDate">
+          </div>
+          <div class="date-input-group">
+            <label class="date-label">To</label>
+            <input type="date" class="date-input" [(ngModel)]="toDate">
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="filter-group">
+        <label class="filter-label">Status</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input 
+              type="radio" 
+              name="status" 
+              value="active" 
+              [checked]="statusFilter === 'active'"
+              (change)="statusFilter = 'active'; onStatusFilterChange()"
+            >
+            Active
+          </label>
+          <label class="radio-label">
+            <input 
+              type="radio" 
+              name="status" 
+              value="inactive" 
+              [checked]="statusFilter === 'inactive'"
+              (change)="statusFilter = 'inactive'; onStatusFilterChange()"
+            >
+            Inactive
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+   <div class="right-side">
+   <div class="users-count">
+        {{ totalUsers }} Users Found
+      </div>
+  <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th class="sortable">
+              Name
+              <i class="sort-icon">↕</i>
+            </th>
+            <th>Email</th>
+            <th>Role</th>
+            <th class="sortable">
+              Created On
+              <i class="sort-icon">↕</i>
+            </th>
+            <th>Status</th>
+            <th style="padding-left: 20px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers">
+            <td class="name-cell">{{ user.firstName + ' ' + user.lastName}}</td>
+            <td class="email-cell">{{ user.email }}</td>
+            <td class="role-cell">{{ user.role }}</td>
+            <td class="date-cell">{{ user.createdOn }}</td>
+            <td class="status-cell">
+              <span 
+                class="status-badge" 
+                [ngClass]="{
+                  'status-active': user.status.toLowerCase() === 'active',
+                  'status-inactive': user.status.toLowerCase() === 'inactive',
+                }"
+              >
+                {{ user.status }}
+              </span>
+
+            </td>
+            <td class="actions-cell">
+              <button type="button" class="p-button p-component">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button type="button" class="p-button p-component">
+                <i class="pi pi-eye" style="color: black"></i>
+              </button>
+
+            <button type="button" class="p-button p-component">
+                <i class="pi pi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+</div></div>
+</div>

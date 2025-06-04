@@ -1,0 +1,10 @@
+{
+  "/api": {
+    "target": "https://stage-api.freightify.io",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/api/v2"
+    }
+  }
+}
