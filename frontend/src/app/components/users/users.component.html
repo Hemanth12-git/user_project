@@ -10,17 +10,17 @@
         <i class="icon-download"></i>
         Import
       </button>
-      <button class="btn btn-primary" icon="pi pi-user-plus" (click)="openAddUserDialog()">+ Create New User</button>
+      <button class="btn btn-primary" icon="pi pi-user-plus" (click)="openAddUserDialog('create')">+ Create New User</button>
 
       <p-dialog 
-        header="Create User" 
+        [header]="edit ? 'Edit User' : (isView ? 'View User' : 'Create User')"
         [(visible)]="displayAddUserDialog" 
         [modal]="true" 
         [closable]="true" 
         [style]="{ width: '50vw', minWidth: '600px' }"
         styleClass="create-user-dialog">
         <hr/>
-        <form [formGroup]="userForm" (ngSubmit)="createUser()">
+        <form [formGroup]="userForm" (ngSubmit)= onSubmit()>
           <div class="dialog-content">
             
             <!-- Header Tab -->
@@ -96,13 +96,16 @@
                 </div>
                 
                 <div class="form-field">
-                  <label for="emailId">Email ID</label>
+                  <label for="email">Email ID</label>
                   <input 
-                    id="emailId" 
+                    id="email" 
                     type="email" 
                     pInputText 
-                    formControlName="emailId"
-                    placeholder="Email" />
+                    formControlName="email"
+                    placeholder="Email"
+                    [style.backgroundColor]="userForm.get('email')?.disabled ? '#f0f0f0' : 'white'"
+                    [style.color]="userForm.get('email')?.disabled ? '#999' : 'black'" 
+                  />
                 </div>
               </div>
 
@@ -173,7 +176,7 @@
           </div>
 
           <!-- Dialog Footer -->
-          <div class="dialog-footer">
+          <div class="dialog-footer" *ngIf="!isView">
             <button 
               pButton 
               type="button" 
@@ -184,9 +187,9 @@
             <button 
               pButton 
               type="submit" 
-              label="Submit" 
+              [label]="edit ? 'Update' : 'Submit'"
               class="submit-btn"
-              [disabled]="userForm.invalid">
+              [disabled]="edit ? false : userForm.invalid">
             </button>
           </div>
           
@@ -365,10 +368,10 @@
 
             </td>
             <td class="actions-cell">
-              <button type="button" class="p-button p-component">
+              <button type="button" class="p-button p-component" (click)="openAddUserDialog('edit', user)">
                 <i class="pi pi-pencil"></i>
               </button>
-              <button type="button" class="p-button p-component">
+              <button type="button" class="p-button p-component" (click)="openAddUserDialog('view', user)">
                 <i class="pi pi-eye" style="color: black"></i>
               </button>
 

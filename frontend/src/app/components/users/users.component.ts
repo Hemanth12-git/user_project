@@ -49,6 +49,9 @@ export class UsersComponent implements OnInit {
 
   // Dialog and form
   displayAddUserDialog = false;
+  edit = false;
+  isView = false;
+  selectedUserId: string | null = null;
   userForm: FormGroup;
   userTypes = [
     { label: 'Internal', value: 'internal' },
@@ -79,11 +82,11 @@ export class UsersComponent implements OnInit {
       phoneNumber: ['', Validators.required],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
-      userType: [null, Validators.required], // add this
+      userType: [null, Validators.required], // add thisthis.passwordMatchValidator
       userRole: [null, Validators.required],
       userCurrency: ['INR', Validators.required], // add this
       numberFormat: ['english', Validators.required],
-      invalid: this.passwordMatchValidator
+      invalid: true,
     });
 
   }
@@ -92,18 +95,59 @@ export class UsersComponent implements OnInit {
     this.fetchUsers();
   }
 
+  onSubmit() {
+    if (this.edit) {
+      this.editUser();
+    } else {
+      this.createUser();
+    }
+  }
+
+
   private passwordMatchValidator(form: FormGroup) {
     const pass = form.get('password')?.value;
     const confirm = form.get('confirmPassword')?.value;
+    console.log(pass, confirm)
     return pass === confirm ? null : { mismatch: true };
   }
 
-  openAddUserDialog() {
-    this.userForm.reset({
-      currency: 'INR',
-      numberFormat: 'english',
-    });
+  openAddUserDialog(mode: 'create' | 'edit' | 'view', user?: User) {
+    this.edit = mode === 'edit';
+    this.isView = mode === 'view';
     this.displayAddUserDialog = true;
+
+    if ((this.edit || this.isView) && user) {
+      this.selectedUserId = user.id ?? null;
+
+      this.userForm.reset({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        password: '',
+        userRole: user.role,
+        currency: user.currency || 'INR',
+        numberFormat: user.numberFormat || 'english',
+        status: user.status || 'Active',
+        invalid: true,
+      });
+
+      Object.keys(this.userForm.controls).forEach((controlName) => {
+        this.userForm.get(controlName)?.disable();
+      });
+
+    } else {
+      this.selectedUserId = null;
+
+      this.userForm.reset({
+        currency: 'INR',
+        numberFormat: 'english'
+      });
+
+      Object.keys(this.userForm.controls).forEach((controlName) => {
+        this.userForm.get(controlName)?.enable();
+      });
+    }
   }
 
   createUser() {
@@ -112,7 +156,6 @@ export class UsersComponent implements OnInit {
     }
     const dateOnly = new Date().toISOString().split('T')[0];
     const formValue = this.userForm.value;
-    console.log(formValue)
     const newUser: User = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
@@ -137,6 +180,31 @@ export class UsersComponent implements OnInit {
       },
     });
   }
+
+  editUser() {
+    const formValue = this.userForm.value;
+
+    const updatedUser: Partial<User> = {
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      email: formValue.email,
+      phoneNumber: formValue.phoneNumber,
+      role: formValue.userRole,
+      currency: formValue.currency,
+      numberFormat: formValue.numberFormat,
+      status: formValue.status || 'Active',
+    };
+    this.usersService.updateUser(this.selectedUserId!, updatedUser).subscribe({
+      next: () => {
+        this.fetchUsers();
+        this.displayAddUserDialog = false;
+      },
+      error: () => {
+        this.error = 'Failed to update user';
+      }
+    });
+  }
+
 
   fetchUsers() {
     this.loading = true;
@@ -219,11 +287,6 @@ export class UsersComponent implements OnInit {
     this.fromDate = null;
     this.toDate = null;
     this.filteredUsers = this.users;
-  }
-
-  editUser(user: User) {
-    console.log('Edit user:', user);
-    // You can prefill the form and call updateUser() once implemented
   }
 
   viewUser(user: User) {

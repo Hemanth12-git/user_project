@@ -109,11 +109,8 @@ export class UsersService {
       );
   }
 
-  /**
-   * Update an existing user
-   */
-  updateUser(userId: string, user: Partial<User>): Observable<User> {
-    return this.http.put<ApiResponse<User>>(`${this.apiUrl}/users/${userId}`, user, this.getHttpOptions())
+  updateUser(id: string, user: Partial<User>): Observable<User> {
+    return this.http.put<ApiResponse<User>>(`${this.apiUrl}/users/${id}`, user, this.getHttpOptions())
       .pipe(
         map(response => {
           if (response.success) {
@@ -125,9 +122,6 @@ export class UsersService {
       );
   }
 
-  /**
-   * Delete a user
-   */
   deleteUser(userId: string): Observable<boolean> {
     return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/users/${userId}`, this.getHttpOptions())
       .pipe(
