@@ -38,12 +38,15 @@ import { DatePickerModule } from 'primeng/datepicker';
 export class UsersComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
-  searchTerm: string = '';
+  searchName: string = '';
+  searchEmail: string = '';
   roleFilter: string = '';
   currentPage: number = 1;
   pageSize: number = 10;
   fromDate: Date | null = null;
   toDate: Date | null = null;
+  selectedUserType: string = '';
+  userTypeFilter: string = '';
   statusFilter: 'active' | 'inactive' | '' = '';
   totalUsers: number = 0;
   loading: boolean = false;
@@ -163,10 +166,12 @@ export class UsersComponent implements OnInit {
     }
     const dateOnly = new Date().toISOString().split('T')[0];
     const formValue = this.userForm.value;
+    
     const newUser: User = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
       email: formValue.email,
+      userType: formValue.userType,
       phoneNumber: formValue.phoneNumber,
       password: formValue.password,
       role: formValue.userRole,
@@ -178,6 +183,7 @@ export class UsersComponent implements OnInit {
 
     this.usersService.createUser(newUser).subscribe({
       next: (createdUser) => {
+        console.log('inside next')
         // The backend returns { id: ObjectId } for POST; fetch the list again
         this.fetchUsers();
         this.displayAddUserDialog = false;
@@ -200,6 +206,7 @@ export class UsersComponent implements OnInit {
       currency: formValue.currency,
       numberFormat: formValue.numberFormat,
       status: formValue.status || 'Active',
+      userType: formValue.userType,
     };
     this.usersService.updateUser(this.selectedUserId!, updatedUser).subscribe({
       next: () => {
@@ -216,8 +223,17 @@ export class UsersComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.currentPage = page;
-    
-    this.usersService.getUsers(this.currentPage, this.pageSize).subscribe({
+    const filters = {
+      name: this.searchName || '',
+      email: this.searchEmail || '',
+      userType: this.userTypeFilter || '',
+      role: this.roleFilter || '',
+      status: this.statusFilter || '',
+      fromDate: this.fromDate ? new Date(this.fromDate).toISOString() : '',
+      toDate: this.toDate ? new Date(this.toDate).toISOString() : '',
+    };
+
+    this.usersService.getUsers(this.currentPage, this.pageSize, filters).subscribe({
       next: (res) => {
         this.users = res.data;
         this.filteredUsers = res.data;
@@ -231,13 +247,14 @@ export class UsersComponent implements OnInit {
     });
   }
 
+
   applyFilters() {
     this.filteredUsers = this.users.filter((user) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
       const matchesSearch =
-        fullName.includes(this.searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.phoneNumber.toLowerCase().includes(this.searchTerm.toLowerCase());
+        fullName.includes(this.searchName.toLowerCase()) ||
+        user.email.toLowerCase().includes(this.searchName.toLowerCase()) ||
+        user.phoneNumber.toLowerCase().includes(this.searchName.toLowerCase());
 
       const matchesRole =
         !this.roleFilter ||
@@ -268,31 +285,43 @@ export class UsersComponent implements OnInit {
 
   onSearchChange() {
     setTimeout(() => {
-      this.applyFilters();
+      this.fetchUsers();
     }, 300);
   }
 
   onRoleFilterChange() {
     setTimeout(() => {
-      this.applyFilters();
+      this.fetchUsers();
     }, 300);
   }
 
+  onUserTypeChange(event: any) {
+    this.selectedUserType = event.value;
+    console.log('Selected User Type:', this.selectedUserType);
+  }
+
   onStatusFilterChange() {
-    this.applyFilters();
+    this.fetchUsers();
   }
 
   onDateRangeChange() {
-    this.applyFilters();
+    this.fetchUsers();
+  }
+
+  onUserTypeFilterChange() {
+    this.fetchUsers();
   }
 
   clearAllFilters() {
-    this.searchTerm = '';
+    this.searchName = '';
+    this.searchEmail = '';
     this.roleFilter = '';
     this.statusFilter = '';
+    this.userTypeFilter = '';
     this.fromDate = null;
     this.toDate = null;
     this.filteredUsers = this.users;
+    this.fetchUsers();
   }
 
   viewUser(user: User) {
@@ -320,9 +349,9 @@ export class UsersComponent implements OnInit {
       this.usersService.deleteUser(user.id!).subscribe({
         next: () => {
           this.users = this.users.filter((u) => u.id !== user.id);
-          this.applyFilters();
           this.totalUsers = this.users.length;
           this.loading = false;
+          this.fetchUsers()
         },
         error: (error) => {
           console.error('Error deleting user:', error);

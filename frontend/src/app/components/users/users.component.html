@@ -42,6 +42,7 @@
                     placeholder="Internal"
                     optionLabel="label" 
                     optionValue="value"
+                    (onChange)="onUserTypeChange($event)"
                     [style]="{ width: '100%' }">
                   </p-dropdown>
                 </div>
@@ -231,7 +232,8 @@
               type="radio" 
               name="userType" 
               value="internal" 
-              
+              [(ngModel)]="userTypeFilter"
+              (change)="onUserTypeFilterChange()"
               
             >
             Internal Users
@@ -241,8 +243,8 @@
               type="radio" 
               name="userType" 
               value="customers" 
-              
-              
+              [(ngModel)]="userTypeFilter"
+              (change)="onUserTypeFilterChange()"
             >
             Customers
           </label>
@@ -251,18 +253,32 @@
 
       <!-- User Details Search -->
       <div class="filter-group">
-        <label class="filter-label">User Details</label>
+        <label class="filter-label">User Name</label>
         <div class="search-input-wrapper">
           <input 
             type="text" 
             class="search-input" 
-            placeholder="Search Users" 
-            [(ngModel)]="searchTerm"
+            placeholder="Search User Name" 
+            [(ngModel)]="searchName"
             (input)="onSearchChange()"
           >
           <i class="search-icon">🔍</i>
         </div>
       </div>
+      <div class="filter-group">
+        <label class="filter-label">User Email</label>
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search User Email" 
+            [(ngModel)]="searchEmail"
+            (input)="onSearchChange()"
+          >
+          <i class="search-icon">🔍</i>
+        </div>
+      </div>
+
 
       <!-- Roles Filter -->
       <div class="filter-group">

@@ -15,6 +15,7 @@ export interface User {
   numberFormat: string;
   createdOn: string;
   status: string;
+  userType: string;
 }
 
 
@@ -55,21 +56,28 @@ export class UsersService {
   /**
    * Fetch all users from the API
    */
-  getUsers(page: number = 1, limit: number = 10): Observable<PaginatedResponse<User>> {
-  const params = new HttpParams()
-    .set('page', page.toString())
-    .set('limit', limit.toString());
+  getUsers(
+    page: number = 1,
+    limit: number = 10,
+    filters: { name?: string; email?: string; userType?: string; role?: string; status?: string; fromDate?: string; toDate?: string } = {}
+  ): Observable<PaginatedResponse<User>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
 
-  return this.http.get<PaginatedResponse<User>>(`${this.apiUrl}/users`, { params, ...this.getHttpOptions() })
-    .pipe(
-      catchError(this.handleError)
-    );
+    if (filters.name) params = params.set('name', filters.name);
+    if (filters.email) params = params.set('email', filters.email);
+    if (filters.userType) params = params.set('userType', filters.userType);
+
+    if (filters.role) params = params.set('role', filters.role);
+    if (filters.status) params = params.set('status', filters.status);
+    if (filters.fromDate) params = params.set('fromDate', filters.fromDate);
+    if (filters.toDate) params = params.set('toDate', filters.toDate);
+
+    return this.http.get<PaginatedResponse<User>>(`${this.apiUrl}/users`, { params, ...this.getHttpOptions() })
+      .pipe(catchError(this.handleError));
   }
 
-
-  /**
-   * Get users with filtering and pagination
-   */
   getUsersWithFilters(filters: any): Observable<User[]> {
     const params = new URLSearchParams();
     
