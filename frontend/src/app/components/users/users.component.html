@@ -383,5 +383,22 @@
         </tbody>
       </table>
   </div>
+  <div *ngIf="totalUsers > pageSize" class="pagination">
+      <button (click)="fetchUsers(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+
+      <span *ngFor="let page of totalPages">
+        <button 
+          (click)="fetchUsers(page)" 
+          [class.active]="currentPage === page">
+          {{ page }}
+        </button>
+      </span>
+
+      <button 
+        (click)="fetchUsers(currentPage + 1)" 
+        [disabled]="currentPage === totalPages.length">
+        Next
+      </button>
+  </div>
 </div></div>
 </div>

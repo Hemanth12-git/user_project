@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -23,6 +23,11 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   totalCount?: number;
+}
+
+interface PaginatedResponse<T> {
+  data: T[];
+  totalUsers: number;
 }
 
 @Injectable({
@@ -50,17 +55,15 @@ export class UsersService {
   /**
    * Fetch all users from the API
    */
-  getUsers(): Observable<User[]> {
-    return this.http.get<ApiResponse<User[]>>(`${this.apiUrl}/users`, this.getHttpOptions())
-      .pipe(
-        map(response => {
-          if (response && response.data) {
-            return response.data;
-          }
-          throw new Error('Failed to fetch users');
-        }),
-        catchError(this.handleError)
-      );
+  getUsers(page: number = 1, limit: number = 10): Observable<PaginatedResponse<User>> {
+  const params = new HttpParams()
+    .set('page', page.toString())
+    .set('limit', limit.toString());
+
+  return this.http.get<PaginatedResponse<User>>(`${this.apiUrl}/users`, { params, ...this.getHttpOptions() })
+    .pipe(
+      catchError(this.handleError)
+    );
   }
 
 

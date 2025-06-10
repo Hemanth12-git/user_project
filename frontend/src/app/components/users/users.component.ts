@@ -40,6 +40,8 @@ export class UsersComponent implements OnInit {
   filteredUsers: User[] = [];
   searchTerm: string = '';
   roleFilter: string = '';
+  currentPage: number = 1;
+  pageSize: number = 10;
   fromDate: Date | null = null;
   toDate: Date | null = null;
   statusFilter: 'active' | 'inactive' | '' = '';
@@ -73,6 +75,11 @@ export class UsersComponent implements OnInit {
     { label: '1,000,000.00 (English)', value: 'english' },
     { label: '1.000.000,00 (European)', value: 'european' },
   ];
+
+  get totalPages(): number[] {
+    const pageCount = Math.ceil(this.totalUsers / this.pageSize);
+    return Array.from({ length: pageCount }, (_, i) => i + 1);
+  }
 
   constructor(private usersService: UsersService, private fb: FormBuilder) {
     this.userForm = this.fb.group({
@@ -205,17 +212,16 @@ export class UsersComponent implements OnInit {
     });
   }
 
-
-  fetchUsers() {
+  fetchUsers(page: number = 1) {
     this.loading = true;
     this.error = '';
-    this.usersService.getUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-        console.log(data)
-        this.filteredUsers = data;
-        this.totalUsers = data.length;
-        this.applyFilters();
+    this.currentPage = page;
+    
+    this.usersService.getUsers(this.currentPage, this.pageSize).subscribe({
+      next: (res) => {
+        this.users = res.data;
+        this.filteredUsers = res.data;
+        this.totalUsers = res.totalUsers;
         this.loading = false;
       },
       error: () => {
@@ -326,4 +332,5 @@ export class UsersComponent implements OnInit {
       });
     }
   }
+  
 }
