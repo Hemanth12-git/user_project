@@ -6,7 +6,6 @@ import (
 	"user_project/backend/models"
 	"user_project/backend/services"
 
-	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -99,9 +98,6 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("User Input:", user)
-	log.Println("UserType received:", user.UserType)
-	log.Printf("Full user struct: %+v", user)
 	result, err := services.CreateUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

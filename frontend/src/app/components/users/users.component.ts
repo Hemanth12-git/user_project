@@ -184,12 +184,13 @@ export class UsersComponent implements OnInit {
     this.usersService.createUser(newUser).subscribe({
       next: (createdUser) => {
         console.log('inside next')
-        // The backend returns { id: ObjectId } for POST; fetch the list again
         this.fetchUsers();
         this.displayAddUserDialog = false;
       },
       error: () => {
         this.error = 'Failed to create user';
+        this.fetchUsers();
+        this.displayAddUserDialog = false;
       },
     });
   }
@@ -215,6 +216,8 @@ export class UsersComponent implements OnInit {
       },
       error: () => {
         this.error = 'Failed to update user';
+        this.fetchUsers();
+        this.displayAddUserDialog = false;
       }
     });
   }
